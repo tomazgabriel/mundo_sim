@@ -63,5 +63,5 @@ while len(lista_pessoas) < 10000 and len(lista_pessoas) > 1:
     ano_corrente(comida, agricultura, idade_fertil_min, idade_fertil_max, trabalhadores_campo)
     print("pop: ", len(lista_pessoas), "\nComida/Trabalhadores: {}".format(agricultura_planeta(comida, agricultura,trabalhadores_campo)))
 
-#teste
+
     
