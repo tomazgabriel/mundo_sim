@@ -24,6 +24,7 @@ class Pessoas:
         self.sexo = random.randint(0,1)
         self.idade = idade
         self.educacao = educacao
+
         def intel(self):
             #chances da população ter mais inteligência aumentaram com a quantidade de educação
             if educacao >= 0 and educacao <= 10:
@@ -51,14 +52,21 @@ class Pessoas:
                 peso =[1,1,1,1,1,2,2,2,3,3,3]
                 rand_intel = (random.choices(int, weights=peso, k=1))
                 self.inteligencia = rand_intel[0]
+            elif educacao >= 100:
+                int = [0,1,2,3,4,5,6,7,8,9,10]
+                peso =[1,1,1,2,2,3,3,3,4,4,4]
+                rand_intel = (random.choices(int, weights=peso, k=1))
+                self.inteligencia = rand_intel[0]
+                
         def empregos(self):
             #empregos 0 = desempregado, 1=campo, 2=educacao
             for pessoa in lista_pessoas:
-                if pessoa.inteligencia >= 8:
-                    self.emprego = 2
-                else:
+                if pessoa.inteligencia >= 0 and pessoa.inteligencia <= 5:
                     self.emprego = 1
-        
+                elif pessoa.inteligencia >=8:
+                    self.emprego = 2
+
+
         self.emprego = 0
         self.inteligencia = 0
 
@@ -79,7 +87,6 @@ def agricultura_planeta(comida, agricultura, trabalhadores_campo):
     else:
         comida -= len(lista_pessoas)
     return comida, trabalhadores_campo
-
 def reproducao(idade_fertil_min, idade_fertil_max):
     for pessoa in lista_pessoas:
         if pessoa.sexo == 1:
@@ -93,7 +100,7 @@ def educacao_planeta(professores, educacao, pesquisa):
         if pessoa.idade > 25:
             if pessoa.emprego == 2:
                 professores += 1
-    educacao += professores
+    educacao += int(professores *1.50)
     pesquisa += int(educacao*2) #substituir o 2 por cientistas
     #immpedir divisão por 0
     if pesquisa <= 0:
@@ -101,6 +108,12 @@ def educacao_planeta(professores, educacao, pesquisa):
     if educacao <= 0:
         educacao += 1
     return professores, educacao, pesquisa
+
+def techs(pesquisa, agricultura): #corrigir obtenção de pontos de pesquisa
+    limite_tech = pesquisa
+    for t in range(agricultura, limite_tech):
+        agricultura += t
+    return agricultura
 
 def sim():
     for x in range(pop_inicial):
@@ -110,7 +123,7 @@ def ano_corrente(comida, agricultura, idade_fertil_min, idade_fertil_max, trabal
     agricultura_planeta(comida, agricultura, trabalhadores_campo)
     reproducao(idade_fertil_min,idade_fertil_max)
     educacao_planeta(professores, educacao, pesquisa)
-
+    techs(pesquisa, agricultura)
     for pessoa in lista_pessoas:
         if pessoa.idade > 80:
             lista_pessoas.remove(pessoa)
@@ -122,8 +135,10 @@ sim()
 
 while len(lista_pessoas) < 1000 and len(lista_pessoas) > 1:
     ano_corrente(comida, agricultura, idade_fertil_min, idade_fertil_max, trabalhadores_campo, professores, educacao, pesquisa)
-    print("pop: ", len(lista_pessoas), "\nComida/Trabalhadores: {}".format(agricultura_planeta(comida, agricultura,trabalhadores_campo)))
+
+    print("pop: ", len(lista_pessoas), "\nComida/Trabalhadores {}".format(agricultura_planeta(comida, agricultura,trabalhadores_campo)))
     print("professores/educação/pesquisa {}".format(educacao_planeta(professores,educacao,pesquisa)))
+    print("Tech:\nagricultura: {}".format(techs(pesquisa,agricultura)))
 
 
     
