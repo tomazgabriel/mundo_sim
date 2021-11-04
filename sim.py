@@ -63,7 +63,7 @@ class Pessoas:
             for pessoa in lista_pessoas:
                 if pessoa.inteligencia >= 0 and pessoa.inteligencia <= 5:
                     self.emprego = 1
-                elif pessoa.inteligencia >=8:
+                elif pessoa.inteligencia >=6:
                     self.emprego = 2
 
 
@@ -74,19 +74,7 @@ class Pessoas:
         intel(self)
 
 
-def agricultura_planeta(comida, agricultura, trabalhadores_campo):
-    trabalhadores_campo = 0
-    for pessoa in lista_pessoas:
-        if pessoa.idade > 18:
-            if pessoa.emprego == 1:
-                trabalhadores_campo += 1
-    comida += trabalhadores_campo*agricultura #ajustar agricultura para nível tecnológico posteriormente
-    if comida < len(lista_pessoas):
-        del lista_pessoas[0:int(len(lista_pessoas)-comida)]
-        comida = 0
-    else:
-        comida -= len(lista_pessoas)
-    return comida, trabalhadores_campo
+
 def reproducao(idade_fertil_min, idade_fertil_max):
     for pessoa in lista_pessoas:
         if pessoa.sexo == 1:
@@ -95,7 +83,7 @@ def reproducao(idade_fertil_min, idade_fertil_max):
                     if random.randint(1,5) == 1: # 1 em cada 5 engravidará
                         lista_pessoas.append(Pessoas(0))
 
-def educacao_planeta(professores, educacao, pesquisa):
+def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educacao, pesquisa):
     for pessoa in lista_pessoas:
         if pessoa.idade > 25:
             if pessoa.emprego == 2:
@@ -107,23 +95,34 @@ def educacao_planeta(professores, educacao, pesquisa):
         pesquisa += 1
     if educacao <= 0:
         educacao += 1
-    return professores, educacao, pesquisa
 
-def techs(pesquisa, agricultura): #corrigir obtenção de pontos de pesquisa
-    limite_tech = pesquisa
-    for t in range(agricultura, limite_tech):
-        agricultura += t
-    return agricultura
+    def techs(pesquisa, agricultura): #tech e atividades gerais
+        agricultura = math.ceil(math.sqrt(pesquisa))
+        def agricultura_planeta(comida, agricultura, trabalhadores_campo): #agricultura
+            trabalhadores_campo = 0
+            for pessoa in lista_pessoas:
+                if pessoa.idade > 18:
+                    if pessoa.emprego == 1:
+                        trabalhadores_campo += 1
+            comida += trabalhadores_campo*agricultura #ajustar agricultura para nível tecnológico posteriormente
+            if comida < len(lista_pessoas):
+                del lista_pessoas[0:int(len(lista_pessoas)-comida)]
+                comida = 0
+            else:
+                comida -= len(lista_pessoas)
+            return comida, trabalhadores_campo
+        agri= agricultura_planeta(comida, agricultura, trabalhadores_campo)
+        return agricultura, agri
+    tech = techs(pesquisa, agricultura)
+    return f"Agricultura: Tech(Comida/Trab) ---Educação: Prof:{professores}/Edu{educacao}/Pes:{pesquisa}\n\t    {tech}"
 
 def sim():
     for x in range(pop_inicial):
         lista_pessoas.append(Pessoas(random.randint(18,50)))
 
-def ano_corrente(comida, agricultura, idade_fertil_min, idade_fertil_max, trabalhadores_campo, professores, educacao, pesquisa):
-    agricultura_planeta(comida, agricultura, trabalhadores_campo)
+def ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesquisa, comida, agricultura, trabalhadores_campo):
     reproducao(idade_fertil_min,idade_fertil_max)
-    educacao_planeta(professores, educacao, pesquisa)
-    techs(pesquisa, agricultura)
+    educacao_planeta(comida, agricultura, trabalhadores_campo,professores, educacao, pesquisa)
     for pessoa in lista_pessoas:
         if pessoa.idade > 80:
             lista_pessoas.remove(pessoa)
@@ -134,11 +133,9 @@ def ano_corrente(comida, agricultura, idade_fertil_min, idade_fertil_max, trabal
 sim()
 
 while len(lista_pessoas) < 1000 and len(lista_pessoas) > 1:
-    ano_corrente(comida, agricultura, idade_fertil_min, idade_fertil_max, trabalhadores_campo, professores, educacao, pesquisa)
+    ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesquisa, comida, agricultura, trabalhadores_campo)
 
-    print("pop: ", len(lista_pessoas), "\nComida/Trabalhadores {}".format(agricultura_planeta(comida, agricultura,trabalhadores_campo)))
-    print("professores/educação/pesquisa {}".format(educacao_planeta(professores,educacao,pesquisa)))
-    print("Tech:\nagricultura: {}".format(techs(pesquisa,agricultura)))
-
+    print(f"Pop: {len(lista_pessoas)}")
+    print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa)))
 
     
