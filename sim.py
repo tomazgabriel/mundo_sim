@@ -3,6 +3,8 @@ import math
 
 pop_inicial = 50
 
+ano = 0
+
 idade_fertil_min = random.randint(14,18)
 idade_fertil_max = random.randint(35,40)
 
@@ -27,32 +29,32 @@ class Pessoas:
 
         def intel(self):
             #chances da população ter mais inteligência aumentaram com a quantidade de educação
-            if educacao >= 0 and educacao <= 10:
+            if educacao >= 0 and educacao <= 30:
                 int = [0,1,2,3,4,5,6,7,8,9,10]
-                peso =[10,9,8,7,6,5,4,3,2,1,1]
+                peso =[10,9,8,7,6,3,2,1,0,0,1]
                 rand_intel = (random.choices(int, weights=peso, k=1))
                 self.inteligencia = rand_intel[0]
-            elif educacao >= 11 and educacao <= 20:
+            elif educacao >= 31 and educacao <= 40:
                 int = [0,1,2,3,4,5,6,7,8,9,10]
-                peso =[9,8,7,6,5,4,3,3,2,2,1]
+                peso =[9,8,7,6,5,4,3,1,0,0,1]
                 rand_intel = (random.choices(int, weights=peso, k=1))
                 self.inteligencia = rand_intel[0]
-            elif educacao >= 21 and educacao <= 70:
+            elif educacao >= 41 and educacao <= 90:
                 int = [0,1,2,3,4,5,6,7,8,9,10]
-                peso =[7,6,5,5,4,4,3,3,3,2,2]
+                peso =[7,6,5,5,4,4,2,2,2,1,1]
                 rand_intel = (random.choices(int, weights=peso, k=1))
                 self.inteligencia = rand_intel[0]
-            elif educacao >= 71 and educacao <= 80:
+            elif educacao >= 91 and educacao <= 100:
                 int = [0,1,2,3,4,5,6,7,8,9,10]
-                peso =[4,4,4,4,5,5,5,5,3,3,3]
+                peso =[4,4,4,4,5,5,5,5,3,3,2]
                 rand_intel = (random.choices(int, weights=peso, k=1))
                 self.inteligencia = rand_intel[0]
-            elif educacao >= 81:
+            elif educacao >= 101:
                 int = [0,1,2,3,4,5,6,7,8,9,10]
                 peso =[1,1,1,1,1,2,2,2,3,3,3]
                 rand_intel = (random.choices(int, weights=peso, k=1))
                 self.inteligencia = rand_intel[0]
-            elif educacao >= 100:
+            elif educacao >= 300:
                 int = [0,1,2,3,4,5,6,7,8,9,10]
                 peso =[1,1,1,2,2,3,3,3,4,4,4]
                 rand_intel = (random.choices(int, weights=peso, k=1))
@@ -85,7 +87,7 @@ def reproducao(idade_fertil_min, idade_fertil_max):
 
 def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educacao, pesquisa):
     for pessoa in lista_pessoas:
-        if pessoa.idade > 25:
+        if pessoa.idade > 25: #idade para profissão
             if pessoa.emprego == 2:
                 professores += 1
     educacao += int(professores *1.50)
@@ -101,10 +103,10 @@ def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educ
         def agricultura_planeta(comida, agricultura, trabalhadores_campo): #agricultura
             trabalhadores_campo = 0
             for pessoa in lista_pessoas:
-                if pessoa.idade > 18:
+                if pessoa.idade > 18: #idade para profissão
                     if pessoa.emprego == 1:
                         trabalhadores_campo += 1
-            comida += trabalhadores_campo*agricultura #ajustar agricultura para nível tecnológico posteriormente
+            comida += trabalhadores_campo*agricultura 
             if comida < len(lista_pessoas):
                 del lista_pessoas[0:int(len(lista_pessoas)-comida)]
                 comida = 0
@@ -114,7 +116,7 @@ def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educ
         agri= agricultura_planeta(comida, agricultura, trabalhadores_campo)
         return agricultura, agri
     tech = techs(pesquisa, agricultura)
-    return f"Agricultura: Tech(Comida/Trab) ---Educação: Prof:{professores}/Edu{educacao}/Pes:{pesquisa}\n\t    {tech}"
+    return f"Agricultura: Tech(Comida/Trab) ---Educação: Prof:{professores}/Edu:{educacao}/Pes:{pesquisa}\n\t    {tech}"
 
 def sim():
     for x in range(pop_inicial):
@@ -124,18 +126,26 @@ def ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesq
     reproducao(idade_fertil_min,idade_fertil_max)
     educacao_planeta(comida, agricultura, trabalhadores_campo,professores, educacao, pesquisa)
     for pessoa in lista_pessoas:
-        if pessoa.idade > 80:
-            lista_pessoas.remove(pessoa)
+        if pessoa.idade > random.randint(60,100):
+            if pessoa.emprego == 1:
+                lista_pessoas.remove(pessoa)
+                trabalhadores_campo -= 1
+            elif pessoa.emprego == 2:
+                lista_pessoas.remove(pessoa)
+                professores -= 1
+            else:
+                lista_pessoas.remove(pessoa)
         else:
             pessoa.idade += 1
     
 
 sim()
 
-while len(lista_pessoas) < 1000 and len(lista_pessoas) > 1:
+while len(lista_pessoas) < 5000 and len(lista_pessoas) > 1:
+    ano += 1
     ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesquisa, comida, agricultura, trabalhadores_campo)
 
-    print(f"Pop: {len(lista_pessoas)}")
+    print(f"\nAno: {ano} Pop: {len(lista_pessoas)}")
     print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa)))
 
 
