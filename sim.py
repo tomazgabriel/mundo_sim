@@ -141,11 +141,10 @@ def ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesq
 
 sim()
 
-while len(lista_pessoas) < 1000 and len(lista_pessoas) > 1:
+while len(lista_pessoas) < 5000 and len(lista_pessoas) > 1:
     ano += 1
     ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesquisa, comida, agricultura, trabalhadores_campo)
 
     print(f"\nAno: {ano} Pop: {len(lista_pessoas)}")
     print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa)))
-
     
