@@ -1,8 +1,9 @@
 1.Simular pop
 2.Dependendo do nível de educação da pop a inteliência que já nascem tem chances de ser maior
 3.Empregos dependem da inteliência
-    3.1: Trabalhador rural (idade mínima: 18 anos)
-    3.2: Professor (idade mínima: 25 anos)
+    3.1: Trabalhador rural (idade mínima: 18 anos - aposentadoria: 60)
+    3.2: Professor (idade mínima: 25 anos - aposentadoria: 80)
+
 4.Nível de educação aumenta com a quantidade de professores
 5.Colheita depende de trabalhadores rurais e a tecnologia da agricultura
 6.Tecnologia da agricultura aumenta com o nível de pesquisa
