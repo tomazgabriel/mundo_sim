@@ -8,6 +8,10 @@ ano = 0
 idade_fertil_min = random.randint(14,18)
 idade_fertil_max = random.randint(35,40)
 
+dinheiro = 0
+valor_aposentadoria = 0
+lista_dinheiro = []
+
 expectativa_vida = 100
 lista_mortos = []
 
@@ -44,6 +48,7 @@ class Pessoas:
         self.emprego = 0
         self.inteligencia = random.randint(0,10)
         self.sorte = random.randint(0,10)
+        self.dinheiro = random.randint(0,100)
 
 
 
@@ -124,18 +129,47 @@ def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educ
         for pessoa in lista_pessoas:
             if pessoa.inteligencia >= 0 and pessoa.inteligencia <= 5: #campo
                 pessoa.emprego = 1
+                pessoa.dinheiro += 2
             elif pessoa.inteligencia >= 6 and pessoa.sorte < 5: #professor
                 pessoa.emprego = 2
+                pessoa.dinheiro += 4
             elif pessoa.inteligencia >= 6 and pessoa.sorte > 5 and pessoa.sorte < 7: #cienctista
                 pessoa.emprego = 4
+                pessoa.dinheiro += 6
             elif pessoa.inteligencia == 0: #desempregado
                 pessoa.emprego = 3
+                pessoa.dinheiro += 0
+            elif pessoa.emprego == 3: #aposentado
+                if pessoa.inteligencia >= 0 and pessoa.inteligencia <= 5: #campo
+                    pessoa.dinheiro += valor_aposentadoria+1
+                elif pessoa.inteligencia >= 6 and pessoa.sorte < 5: #professor
+                    pessoa.dinheiro += valor_aposentadoria+2
+                elif pessoa.inteligencia >= 6 and pessoa.sorte > 5 and pessoa.sorte < 7: #cienctista
+                    pessoa.dinheiro += valor_aposentadoria+3
+                elif pessoa.inteligencia >= 7 and pessoa.sorte > 7: #medico
+                    pessoa.dinheiro += valor_aposentadoria+5
+                elif pessoa.inteligencia == 0: #desempregado
+                    pessoa.dinheiro += valor_aposentadoria
+                    
             elif pessoa.inteligencia >= 7 and pessoa.sorte > 7: #medico
                 pessoa.emprego = 5
+                pessoa.dinheiro += 10
                 
                 
     
     empregos()
+
+    def economia():
+        inflacao = math.ceil(sum(lista_dinheiro)-len(lista_pessoas))
+        preco_comida = ((comida+inflacao)/len(lista_pessoas)/10000)#preço alimento
+        for pessoa in lista_pessoas:
+            lista_dinheiro.append(pessoa.dinheiro)
+            if pessoa.dinheiro < preco_comida: #morrer de fome
+                lista_pessoas.remove(pessoa)
+                #print(f"Morreu de fome aos {pessoa.idade} com R${pessoa.dinheiro}")
+            elif pessoa.dinheiro > preco_comida:
+                pessoa.dinheiro -= preco_comida
+        print(f"Inflação: {str(inflacao)[:2]}|Preço alimento:{str(preco_comida)[:3]}")
 
     def intel(educacao):
     #chances da população ter mais inteligência aumentaram com a quantidade de educação
@@ -213,8 +247,10 @@ def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educ
             comida += trabalhadores_campo*agricultura 
             if comida < len(lista_pessoas):
                 del lista_pessoas[0:int(len(lista_pessoas)-comida)]
+                economia()
                 comida = 0
             else:
+                economia()
                 comida -= len(lista_pessoas)
             return comida, trabalhadores_campo
         agri= agricultura_planeta(comida, agricultura, trabalhadores_campo)
@@ -225,7 +261,9 @@ def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educ
     #aposentadoria
     for pessoa in lista_pessoas: #aposentadoria/média de idade
         global aposentadoria
+        global valor_aposentadoria
         aposentadoria = (expectativa_vida/2 + 10)
+        valor_aposentadoria = aposentadoria/10
         if pessoa.emprego == 1 and pessoa.idade >= aposentadoria: #campo
             trabalhadores_campo_aposentados += 1
             pessoa.emprego == 0
@@ -255,12 +293,12 @@ def ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesq
     for pessoa in lista_pessoas:
         if pessoa.idade >= expectativa_vida and pessoa.inteligencia != 0:
             lista_pessoas.remove(pessoa)
-            #print(f"Morreu aos {pessoa.idade} anos. Expectativa de vida:{expectativa_vida}. Emprego:{pessoa.emprego}")
+            #print(f"Morreu aos {pessoa.idade} anos. Expectativa de vida:{expectativa_vida}. Emprego:{pessoa.emprego}. Dinheiro:{pessoa.dinheiro}")
             lista_mortos.append(1)
         elif pessoa.idade >= expectativa_vida and pessoa.inteligencia == 0:
             taxa_negativa -= 1
             lista_pessoas.remove(pessoa)
-            #print(f"Morreu aos {pessoa.idade} anos. Expectativa de vida:{expectativa_vida}. Emprego:{pessoa.emprego}")
+            #print(f"Morreu aos {pessoa.idade} anos. Expectativa de vida:{expectativa_vida}. Emprego:{pessoa.emprego}. Dinheiro:{pessoa.dinheiro}")
             lista_mortos.append(1)
         else:
             pessoa.idade += 1
@@ -272,7 +310,7 @@ f.write(" ")
 f.close()
 f = open("resultado.txt", 'a', encoding='utf-8') 
 
-while len(lista_pessoas) < 10000 and len(lista_pessoas) > 1:
+while len(lista_pessoas) < 20000 and len(lista_pessoas) > 1 and ano < 10000:
     ano += 1
 
     ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesquisa, comida, agricultura, trabalhadores_campo, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)
@@ -285,14 +323,18 @@ while len(lista_pessoas) < 10000 and len(lista_pessoas) > 1:
 
 #dados gerais pós simulação
     #média de idade/inteligencia/aposentadoria
+lista_riquezas = []
 if len(lista_pessoas) > 0:
     for pessoa in lista_pessoas:
         lista_idades.append(pessoa.idade)
         lista_inteligencia.append(pessoa.inteligencia)
+        lista_riquezas.append(pessoa.dinheiro)
         idade_media = math.ceil(sum(lista_idades)/len(lista_pessoas))
         inteligencia_media = str(sum(lista_inteligencia)/len(lista_pessoas))
+        riqueza_media = str(sum(lista_riquezas)/len(lista_pessoas))
+         
 
-    print(f"Média de idade: {idade_media}|Média de inteligência: {inteligencia_media[:4]}|Idade final para aposentadoria:{aposentadoria}")
+    print(f"Média de idade: {idade_media}|Média de inteligência: {inteligencia_media[:5]}|Idade final para aposentadoria:{aposentadoria}|Valor aposentadoria final:{valor_aposentadoria}|Média de riquezas:{riqueza_media[:5]}")
 
     f.write(f"\n(Média de idade: {idade_media}|Média de inteligência: {inteligencia_media[:4]}|Idade final aposentadoria:{aposentadoria}")
     f.close()
