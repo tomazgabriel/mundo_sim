@@ -227,12 +227,6 @@ while len(lista_pessoas) < 20000 and len(lista_pessoas) > 1 and ano <= 10000:
     ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesquisa, comida, agricultura, trabalhadores_campo, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia)
 
     print(f"\nAno: {ano} Pop: {len(lista_pessoas)}")
-<<<<<<< HEAD
-    print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa)))
-
-
-    
-=======
     print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia)))
     f.write(f"\nAno: {ano} Pop: {len(lista_pessoas)}\n" "{}\n".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia)))
     
@@ -249,4 +243,3 @@ if len(lista_pessoas) > 0:
 
 f.write(f"\n(Média de idade: {idade_media}|Média de inteligência: {inteligencia_media[:4]}")
 f.close()
->>>>>>> empr
