@@ -1,6 +1,8 @@
 import random
 import math
 
+cronometro = 0
+
 pop_inicial = random.randint(20,50)
 
 ano = 0
@@ -14,6 +16,7 @@ lista_dinheiro = []
 
 expectativa_vida = 100
 lista_mortos = []
+mortes = 0
 
 lista_pessoas = []
 lista_idades = []
@@ -24,7 +27,7 @@ inteligencia_media = 0
 
 taxa_negativa = 1
 
-comida = 50
+comida = 100
 agricultura = 0
 
 educacao = 0
@@ -70,8 +73,10 @@ def reproducao(idade_fertil_min, idade_fertil_max):
                     
 
 def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educacao, pesquisa, trabalhadores_campo_aposentados, professores_aposentados,taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida):
-    #professores/cientistas/médicos
+    global aposentadoria
+    global valor_aposentadoria
     for pessoa in lista_pessoas:
+        #professores/cientistas/médicos
         if pessoa.idade > 25: #idade para profissão//aposentar-se aos 80 anos
             if pessoa.emprego == 2 and pessoa.idade <= 80: #professores
                 professores += 1
@@ -91,6 +96,25 @@ def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educ
 
         if pessoa.inteligencia == 0:
             taxa_negativa += 1
+        
+        #aposentadoria
+        aposentadoria = (expectativa_vida/2 + 10)
+        valor_aposentadoria = aposentadoria/10
+        if pessoa.idade >= aposentadoria:
+            if pessoa.emprego == 1: #campo
+                trabalhadores_campo_aposentados += 1
+                pessoa.emprego == 0
+            elif pessoa.emprego == 2: #professor
+                professores_aposentados += 1
+                pessoa.emprego == 0
+
+            elif pessoa.emprego == 4: #cientista
+                cientistas_aposentados += 1
+                pessoa.emprego == 0
+
+            elif pessoa.emprego == 5: #medico
+                medicos_aposentados += 1
+                pessoa.emprego == 0
             
     taxa_negativa = math.ceil(taxa_negativa/10)
     ciencia += cientistas/taxa_negativa
@@ -161,16 +185,21 @@ def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educ
 
     def economia():
         inflacao = math.ceil(sum(lista_dinheiro)-len(lista_pessoas))
-        preco_comida = ((comida+inflacao)/len(lista_pessoas)/10000)#preço alimento
-        for pessoa in lista_pessoas:
-            lista_dinheiro.append(pessoa.dinheiro)
-            if pessoa.dinheiro < preco_comida: #morrer de fome
-                lista_pessoas.remove(pessoa)
-                #print(f"Morreu de fome aos {pessoa.idade} com R${pessoa.dinheiro}")
-            elif pessoa.dinheiro > preco_comida:
-                pessoa.dinheiro -= preco_comida
-        print(f"Inflação: {str(inflacao)[:2]}|Preço alimento:{str(preco_comida)[:3]}")
-
+        #impedir divisão por zero
+        if inflacao <= 0:
+            inflacao += 0.1
+        if len(lista_pessoas) > 0:
+            preco_comida = ((comida+inflacao)/len(lista_pessoas)/10000)#preço alimento
+            if preco_comida <0:
+                preco_comida += 0.1
+            for pessoa in lista_pessoas:
+                lista_dinheiro.append(pessoa.dinheiro)
+                if pessoa.dinheiro < preco_comida: #morrer de fome
+                    lista_pessoas.remove(pessoa)
+                    #print(f"Morreu de fome aos {pessoa.idade} com R${pessoa.dinheiro}")
+                elif pessoa.dinheiro > preco_comida:
+                    pessoa.dinheiro -= preco_comida
+        #print(preco_comida)
     def intel(educacao):
     #chances da população ter mais inteligência aumentaram com a quantidade de educação
         for pessoa in lista_pessoas:
@@ -257,28 +286,6 @@ def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educ
         return agricultura, agri
     tech = techs(pesquisa, agricultura)
     intel(educacao)
-
-    #aposentadoria
-    for pessoa in lista_pessoas: #aposentadoria/média de idade
-        global aposentadoria
-        global valor_aposentadoria
-        aposentadoria = (expectativa_vida/2 + 10)
-        valor_aposentadoria = aposentadoria/10
-        if pessoa.emprego == 1 and pessoa.idade >= aposentadoria: #campo
-            trabalhadores_campo_aposentados += 1
-            pessoa.emprego == 0
-        if pessoa.emprego == 2 and pessoa.idade >= aposentadoria: #professor
-            professores_aposentados += 1
-            pessoa.emprego == 0
-
-        if pessoa.emprego == 4 and pessoa.idade >= aposentadoria: #cientista
-            cientistas_aposentados += 1
-            pessoa.emprego == 0
-
-        if pessoa.emprego == 5 and pessoa.idade >= aposentadoria: #medico
-            medicos_aposentados += 1
-            pessoa.emprego == 0
-
         
     return f"Agricultura: Tech(Comida/Trab) ---Educação: Prof:{professores}/Edu:{educacao}/Pes:{pesquisa}/Cientistas:{cientistas}/Medicina:{medicina}/Médicos:{medicos}/Tax_neg:{taxa_negativa}\n\t    {tech}\n|Trabalhadores rurais aposentados: {trabalhadores_campo_aposentados}|Professores aposentados: {professores_aposentados}|Cientistas Aposentados: {cientistas_aposentados}|Médicos Aposentados:{medicos_aposentados}"
 
@@ -289,7 +296,7 @@ def sim():
 def ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesquisa, comida, agricultura, trabalhadores_campo, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida):
     reproducao(idade_fertil_min,idade_fertil_max)
     educacao_planeta(comida, agricultura, trabalhadores_campo,professores, educacao, pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)
-    
+    global mortes
     for pessoa in lista_pessoas:
         if pessoa.idade >= expectativa_vida and pessoa.inteligencia != 0:
             lista_pessoas.remove(pessoa)
@@ -302,6 +309,7 @@ def ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesq
             lista_mortos.append(1)
         else:
             pessoa.idade += 1
+    mortes = sum(lista_mortos)
 
 
 sim()
@@ -310,20 +318,32 @@ f.write(" ")
 f.close()
 f = open("resultado.txt", 'a', encoding='utf-8') 
 
-while len(lista_pessoas) < 20000 and len(lista_pessoas) > 1 and ano < 10000:
+segundos, minutos, horas = 0, 0 ,0
+print("aguarde")
+while len(lista_pessoas) < 10000 and len(lista_pessoas) > 1 and ano < 10000:
     ano += 1
+    segundos += 1
+    if segundos > 60:
+        segundos = 0
+        minutos += 1
+        if minutos > 60:
+            segundos = 0
+            minutos = 0
+            horas =+ 1
 
     ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesquisa, comida, agricultura, trabalhadores_campo, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)
-
-    print(f"\nAno: {ano} Pop: {len(lista_pessoas)}")
-    print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)))
-    print(f"Mortes: {sum(lista_mortos)}")
+    #print(f"\nAno: {ano} Pop: {len(lista_pessoas)} Mortes: {mortes}")
+    #print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)))
     f.write(f"\nAno: {ano} Pop: {len(lista_pessoas)}\nMortes:{sum(lista_mortos)}\n" "{}\n".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)))
     
 
+cronometro = str(f"{horas}:{minutos}:{segundos}")
+print("aguarde...")
+print("tempo: ", cronometro)
 #dados gerais pós simulação
-    #média de idade/inteligencia/aposentadoria
 lista_riquezas = []
+print(f"\nAno: {ano} Pop: {len(lista_pessoas)} Mortes: {mortes}")
+print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)))
 if len(lista_pessoas) > 0:
     for pessoa in lista_pessoas:
         lista_idades.append(pessoa.idade)
