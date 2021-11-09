@@ -1,9 +1,14 @@
 import random
 import math
+import pandas as pd
 
 cronometro = 0
 
 pop_inicial = random.randint(20,50)
+primeiro_nome_masculino = {1:"Alan", 2:"Amarildo", 3:"Arnold", 4:"Antonio", 5:"Angelo", 6:"Bruno", 7:"Bento", 8:"Bernardo",
+9:"Carlos", 10:"Celio", 11:"Clóvis", 12:"Celso", 13:"Diego", 14:"Kevin"}
+primeiro_nome_feminino = {1:"Josefina", 2:"Adriana", 3:"Luiza", 4:"Carla", 5:"Diana", 6:"Gabriela"}
+sobrenomes = {1:"Martins", 2:"Pereira", 3:"Lopes", 4:"Antunes", 5:"da Silva", 6:"Tomaz", 7:"Peixoto", 8:"Rodrigues", 9:"Guaracéli", 10:"Kevin"}
 
 ano = 0
 
@@ -52,6 +57,14 @@ class Pessoas:
         self.inteligencia = random.randint(0,10)
         self.sorte = random.randint(0,10)
         self.dinheiro = random.randint(0,100)
+        self.sobrenome = sobrenomes[random.randint(1, len(sobrenomes))]
+        if self.sexo == 0:
+            x = random.randint(1,14)
+            self.nome = primeiro_nome_masculino[x]
+        elif self.sexo == 1:
+            x = random.randint(1,6)
+            self.nome = primeiro_nome_feminino[x]
+
 
 
 
@@ -64,11 +77,14 @@ def reproducao(idade_fertil_min, idade_fertil_max):
                     if pessoa.sorte <= 2:
                         if random.randint(1,10) == 1: # 1 em cada 10 changes
                             lista_pessoas.append(Pessoas(0))
+                            
                     elif pessoa.sorte > 2 and pessoa.sorte <= 5:
                         if random.randint(1,7) == 1: 
+                            x = pessoa.sobrenome
                             lista_pessoas.append(Pessoas(0))
                     elif pessoa.sorte > 5:
                         if random.randint(1,5) == 1: 
+                            x = pessoa.sobrenome
                             lista_pessoas.append(Pessoas(0))
                     
 
@@ -314,12 +330,17 @@ def ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesq
 
 sim()
 f = open("resultado.txt", 'w')
+g = open("pessoas.txt", 'w')
+g.write(" ")
 f.write(" ")
 f.close()
+g.close()
 f = open("resultado.txt", 'a', encoding='utf-8') 
-
+g = open("pessoas.txt", "a", encoding="utf-8")
 segundos, minutos, horas = 0, 0 ,0
 print("aguarde")
+debug = input("Qualquer tecla para esperar o resultado final\n'z' para pular de ano em ano\n'x' para percorrer todos os anos: ")
+l = True
 while len(lista_pessoas) < 10000 and len(lista_pessoas) > 1 and ano < 10000:
     ano += 1
     segundos += 1
@@ -332,15 +353,53 @@ while len(lista_pessoas) < 10000 and len(lista_pessoas) > 1 and ano < 10000:
             horas =+ 1
 
     ano_corrente(idade_fertil_min, idade_fertil_max, professores, educacao, pesquisa, comida, agricultura, trabalhadores_campo, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)
-    #print(f"\nAno: {ano} Pop: {len(lista_pessoas)} Mortes: {mortes}")
-    #print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)))
+
+    if debug == "z":
+        print(f"\nAno: {ano} Pop: {len(lista_pessoas)} Mortes: {mortes}")
+        print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)))
+        for pessoa in lista_pessoas:
+            print(f"{pessoa.nome} {pessoa.sobrenome} {pessoa.sexo}")
+        debug = input("...: ")
+    elif debug == "x":
+        print(f"\nAno: {ano} Pop: {len(lista_pessoas)} Mortes: {mortes}")
+        print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)))
+    else:
+        while l == True:
+            print("aguarde")
+            l = False
+        
     f.write(f"\nAno: {ano} Pop: {len(lista_pessoas)}\nMortes:{sum(lista_mortos)}\n" "{}\n".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)))
-    
 
 cronometro = str(f"{horas}:{minutos}:{segundos}")
 print("aguarde...")
 print("tempo: ", cronometro)
 #dados gerais pós simulação
+#dados das pessoas
+dataframe = pd.DataFrame()
+nmp = [] #nome
+nmps = [] #sobrenome
+ep = [] #emprego
+gp = [] #genero
+din = [] #dinheiro
+idp = [] #idade
+for pessoas in lista_pessoas:
+    nmp.append(pessoas.nome)
+    idp.append(pessoas.idade)
+    nmps.append(pessoas.sobrenome)
+    gp.append(pessoas.sexo)
+    ep.append(pessoas.emprego)
+    din.append(pessoas.dinheiro)
+nmp_series = pd.Series(nmp)
+idp_series = pd.Series(idp)
+nmps_series = pd.Series(nmps)
+gp_series = pd.Series(gp)
+ep_series = pd.Series(ep)
+din_series = pd.Series(din)
+dataframe = pd.DataFrame({'Nomes':nmp_series,'Sobrenome':nmps_series,'Gênero':gp_series, 'Idade':idp_series, 'Emprego':ep_series,'Dinheiro':din_series})
+pd.set_option('display.max_rows', len(lista_pessoas))
+g.write("Gênero: 0=M, 1=F\nEmpregos: 0=Aposentado, 1=Campo, 2=Professor, 3=Desempregado, 4=Cientista, 5=Médico\n" + str(dataframe))
+g.close()
+
 lista_riquezas = []
 print(f"\nAno: {ano} Pop: {len(lista_pessoas)} Mortes: {mortes}")
 print("{}".format(educacao_planeta(comida, agricultura, trabalhadores_campo,professores,educacao,pesquisa, trabalhadores_campo_aposentados, professores_aposentados, taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida)))
