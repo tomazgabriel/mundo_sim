@@ -9,6 +9,8 @@ primeiro_nome_masculino = {1:"Alan", 2:"Amarildo", 3:"Arnold", 4:"Antonio", 5:"A
 9:"Carlos", 10:"Celio", 11:"Clóvis", 12:"Celso", 13:"Diego", 14:"Kevin"}
 primeiro_nome_feminino = {1:"Josefina", 2:"Adriana", 3:"Luiza", 4:"Carla", 5:"Diana", 6:"Gabriela"}
 sobrenomes = {1:"Martins", 2:"Pereira", 3:"Lopes", 4:"Antunes", 5:"da Silva", 6:"Tomaz", 7:"Peixoto", 8:"Rodrigues", 9:"Guaracéli", 10:"Kevin"}
+tracos_positivos = {1:'inteligente', 2:'sortudo'}
+tracos_negativos = {2:'analfabetismo', 3:'azarado'}
 
 ano = 0
 
@@ -64,6 +66,8 @@ class Pessoas:
         elif self.sexo == 1:
             x = random.randint(1,6)
             self.nome = primeiro_nome_feminino[x]
+        self.tracos_p = random.randint(1, len(tracos_positivos))
+        self.tracos_n = random.randint(1, len(tracos_negativos))
 
 
 
@@ -86,7 +90,7 @@ def reproducao(idade_fertil_min, idade_fertil_max):
                         if random.randint(1,5) == 1: 
                             x = pessoa.sobrenome
                             lista_pessoas.append(Pessoas(0))
-                    
+
 
 def educacao_planeta(comida, agricultura, trabalhadores_campo, professores, educacao, pesquisa, trabalhadores_campo_aposentados, professores_aposentados,taxa_negativa, cientistas, cientistas_aposentados, ciencia, medicina, medicos, medicos_aposentados, expectativa_vida):
     global aposentadoria
@@ -382,6 +386,8 @@ ep = [] #emprego
 gp = [] #genero
 din = [] #dinheiro
 idp = [] #idade
+trrp = [] #traços positivos
+trrn = [] #traços negativos
 for pessoas in lista_pessoas:
     nmp.append(pessoas.nome)
     idp.append(pessoas.idade)
@@ -389,13 +395,17 @@ for pessoas in lista_pessoas:
     gp.append(pessoas.sexo)
     ep.append(pessoas.emprego)
     din.append(pessoas.dinheiro)
+    trrp.append(pessoas.tracos_p)
+    trrn.append(pessoas.tracos_n)
 nmp_series = pd.Series(nmp)
 idp_series = pd.Series(idp)
 nmps_series = pd.Series(nmps)
 gp_series = pd.Series(gp)
 ep_series = pd.Series(ep)
 din_series = pd.Series(din)
-dataframe = pd.DataFrame({'Nomes':nmp_series,'Sobrenome':nmps_series,'Gênero':gp_series, 'Idade':idp_series, 'Emprego':ep_series,'Dinheiro':din_series})
+trrp_series = pd.Series(trrp)
+trrn_series = pd.Series(trrn)
+dataframe = pd.DataFrame({'Nomes':nmp_series,'Sobrenome':nmps_series,'Gênero':gp_series, 'Idade':idp_series, 'Emprego':ep_series,'Dinheiro':din_series, 'Traços Positivos':trrp_series, 'Traços Negativos':trrn_series})
 pd.set_option('display.max_rows', len(lista_pessoas))
 g.write("Gênero: 0=M, 1=F\nEmpregos: 0=Aposentado, 1=Campo, 2=Professor, 3=Desempregado, 4=Cientista, 5=Médico\n" + str(dataframe))
 g.close()
